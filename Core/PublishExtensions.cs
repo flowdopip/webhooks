@@ -9,17 +9,16 @@ namespace Archon.Webhooks
 	{
 		public static void QueueAsyncEventFlush(this HttpRequestMessage request)
 		{
-			using (var client = new HttpClient())
-			{
-				client.BaseAddress = new Uri(String.Format("{0}{1}{2}", request.RequestUri.Scheme, Uri.SchemeDelimiter, request.RequestUri.Authority));
-				QueueAsyncEventFlush(client);
-			}
+			var client = new HttpClient(); //don't dispose of the HttpClient since we are firing & forgetting and don't want it to dispose before it is done
+			client.BaseAddress = new Uri(String.Format("{0}{1}{2}", request.RequestUri.Scheme, Uri.SchemeDelimiter, request.RequestUri.Authority));
+			QueueAsyncEventFlush(client);
 		}
 
 		public static void QueueAsyncEventFlush(this HttpClient client)
 		{
 			//fire & forget, don't wait for the request to come back
-			client.PostAsync("/hooks/flush", new StringContent(""));
+			var req = new HttpRequestMessage(HttpMethod.Post, "hooks/flush");
+			client.SendAsync(req);
 		}
 
 		public static async Task<PublishResult> PublishEvent(this HttpClient client, Event evt)
