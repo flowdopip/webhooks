@@ -9,7 +9,7 @@ namespace Archon.Webhooks.Tests.Unsubscribing_from_an_event
 {
 	public abstract class behaves_like_existing_subscription : TestFixture
 	{
-		protected long id;
+		protected readonly long subscriptionId;
 
 		public behaves_like_existing_subscription()
 		{
@@ -19,7 +19,7 @@ namespace Archon.Webhooks.Tests.Unsubscribing_from_an_event
 			}).Result;
 
 			response.EnsureSuccess().Wait();
-			id = ((dynamic)response.Content.ReadAsAsync<ExpandoObject>().Result).Id;
+			subscriptionId = ((dynamic)response.Content.ReadAsAsync<ExpandoObject>().Result).Id;
 		}
 	}
 
@@ -29,7 +29,7 @@ namespace Archon.Webhooks.Tests.Unsubscribing_from_an_event
 
 		public override void Observe()
 		{
-			response = api.DeleteAsync("/hooks/" + id).Result;
+			response = api.DeleteAsync("/hooks/" + subscriptionId).Result;
 		}
 
 		[Observation]

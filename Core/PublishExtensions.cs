@@ -7,6 +7,21 @@ namespace Archon.Webhooks
 {
 	public static class PublishExtensions
 	{
+		public static void QueueAsyncEventFlush(this HttpRequestMessage request)
+		{
+			using (var client = new HttpClient())
+			{
+				client.BaseAddress = new Uri(String.Format("{0}{1}{2}", request.RequestUri.Scheme, Uri.SchemeDelimiter, request.RequestUri.Authority));
+				QueueAsyncEventFlush(client);
+			}
+		}
+
+		public static void QueueAsyncEventFlush(this HttpClient client)
+		{
+			//fire & forget, don't wait for the request to come back
+			client.PostAsync("/hooks/flush", new StringContent(""));
+		}
+
 		public static async Task<PublishResult> PublishEvent(this HttpClient client, Event evt)
 		{
 			HttpResponseMessage response = null;

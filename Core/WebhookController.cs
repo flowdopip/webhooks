@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Archon.WebApi;
 
@@ -42,9 +43,9 @@ namespace Archon.Webhooks
 		[HttpPost]
 		[Route("flush")]
 		[EnsureNoTrailingSlash]
-		public void FlushEvents()
+		public async Task FlushEvents()
 		{
-
+			await bus.Publish();
 		}
 
 		public class NewWebhook
