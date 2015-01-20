@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Archon.Webhooks.Tests
+namespace Archon.Webhooks
 {
 	public class InMemoryEventBus : EventBus
 	{
