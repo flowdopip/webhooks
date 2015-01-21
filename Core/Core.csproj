@@ -59,6 +59,7 @@
     </Compile>
     <Compile Include="Event.cs" />
     <Compile Include="EventBus.cs" />
+    <Compile Include="FakeEventBus.cs" />
     <Compile Include="InMemoryEventBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
