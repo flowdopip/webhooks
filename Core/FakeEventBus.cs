@@ -2,58 +2,62 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Archon.Webhooks
+namespace Archon.Webhooks.Tests
 {
-	public class FakeEventBus : EventBus
+	public class FakeEventBus : InMemoryEventBus
 	{
-		readonly IList<KeyValuePair<string, object>> events;
+		readonly ISet<Event> publishedEvents;
 
-		public IEnumerable<KeyValuePair<string, object>> Events
+		public IEnumerable<Webhook> Subscriptions
+		{
+			get { return subscriptions; }
+		}
+
+		public IEnumerable<Event> Events
 		{
 			get { return events; }
 		}
 
+		public IEnumerable<Event> PublishedEvents
+		{
+			get { return publishedEvents; }
+		}
+
 		public FakeEventBus()
+			: base(null)
 		{
-			events = new List<KeyValuePair<string, object>>();
-		}
-
-		public Webhook Subscribe(Uri url)
-		{
-			throw new NotSupportedException();
-		}
-
-		public void Unsubscribe(int id)
-		{
-			throw new NotSupportedException();
-		}
-
-		public void Queue(string type, object evt)
-		{
-			events.Add(new KeyValuePair<string, object>(type, evt));
-		}
-
-		public Task Publish()
-		{
-			Clear();
-			return Task.FromResult(true);
+			publishedEvents = new HashSet<Event>();
 		}
 
 		public void Clear()
 		{
 			events.Clear();
+			publishedEvents.Clear();
 		}
 
-		public object AssertEvent(string type)
+		public override void Queue(string type, object evt)
 		{
-			if (String.IsNullOrWhiteSpace(type))
-				throw new ArgumentNullException("type");
+			//for testing purposes, only add a single event for each queued event rather than one for each subscribed webhook
+			events.Add(new Event(new Webhook(new Uri("http://example.com/fake")), type, evt));
+		}
 
+		public override Task Publish()
+		{
 			foreach (var evt in events)
+				publishedEvents.Add(evt);
+
+			events.Clear();
+
+			return Task.FromResult(true);
+		}
+
+		public Event AssertEvent(string type)
+		{
+			foreach (var evt in PublishedEvents)
 			{
-				if (evt.Key == type)
+				if (evt.Type == type)
 				{
-					return evt.Value;
+					return evt;
 				}
 			}
 
