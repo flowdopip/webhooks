@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Archon.Webhooks.Tests
+namespace Archon.Webhooks
 {
 	public class FakeEventBus : InMemoryEventBus
 	{
