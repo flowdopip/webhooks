@@ -53,6 +53,19 @@ namespace Archon.Webhooks
 
 		public Event AssertEvent(string type)
 		{
+			foreach (var evt in Events)
+			{
+				if (evt.Type == type)
+				{
+					return evt;
+				}
+			}
+
+			throw new KeyNotFoundException(String.Format("Could not find event of type '{0}'.", type));
+		}
+
+		public Event AssertPublishedEvent(string type)
+		{
 			foreach (var evt in PublishedEvents)
 			{
 				if (evt.Type == type)
