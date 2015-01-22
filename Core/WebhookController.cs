@@ -8,6 +8,7 @@ using Archon.WebApi;
 namespace Archon.Webhooks
 {
 	[RoutePrefix("hooks")]
+	[AuthorizeCorrectly(Roles = "Webhooks")]
 	public class WebhookController : ApiController
 	{
 		readonly EventBus bus;
@@ -35,6 +36,7 @@ namespace Archon.Webhooks
 		[HttpDelete]
 		[Route("{id:int}")]
 		[EnsureNoTrailingSlash]
+		[AuthorizeCorrectly(Roles = "Webhooks")]
 		public void Unsubscribe(int id)
 		{
 			bus.Unsubscribe(id);

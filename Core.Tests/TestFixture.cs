@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
-using Archon.WebApi;
 using Autofac;
 using Autofac.Integration.WebApi;
 using Xunit.Extensions;
@@ -23,13 +22,14 @@ namespace Archon.Webhooks.Tests
 
 		protected readonly HttpServer server;
 		protected readonly HttpClient api;
-		protected readonly FakeHttpHandler security;
+		protected readonly FakeAuthorizationHandler security;
 		protected readonly FakeEventBus events;
 
 		public TestFixture()
 		{
 			var config = new HttpConfiguration();
 			config.MapHttpAttributeRoutes();
+			config.MessageHandlers.Add(security = new FakeAuthorizationHandler());
 			config.DependencyResolver = new AutofacWebApiDependencyResolver(scope = container.BeginLifetimeScope("application"));
 
 			server = new HttpServer(config);

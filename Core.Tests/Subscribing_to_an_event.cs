@@ -111,10 +111,27 @@ namespace Archon.Webhooks.Tests.Subscribing_to_an_event
 		}
 	}
 
-	public class when_subscribing_to_an_event_with_a_null_url : TestFixture
+	public abstract class behaves_like_failing_to_subscribe_to_an_event : TestFixture
 	{
-		HttpResponseMessage response;
+		protected HttpResponseMessage response;
 
+		protected abstract HttpStatusCode ExpectedResult { get; }
+
+		[Observation]
+		public void should_return_expected_invalid_result()
+		{
+			response.StatusCode.ShouldEqual(ExpectedResult);
+		}
+
+		[Observation]
+		public void should_not_persist_webhook()
+		{
+			events.Subscriptions.ShouldBeEmpty();
+		}
+	}
+
+	public class when_subscribing_to_an_event_with_a_null_url : behaves_like_failing_to_subscribe_to_an_event
+	{
 		public override void Observe()
 		{
 			response = api.PostAsJsonAsync("/hooks/", new
@@ -123,23 +140,14 @@ namespace Archon.Webhooks.Tests.Subscribing_to_an_event
 			}).Result;
 		}
 
-		[Observation]
-		public void should_return_bad_request_result()
+		protected override HttpStatusCode ExpectedResult
 		{
-			response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
-		}
-
-		[Observation]
-		public void should_not_persist_webhook()
-		{
-			events.Subscriptions.ShouldBeEmpty();
+			get { return HttpStatusCode.BadRequest; }
 		}
 	}
 
-	public class when_subscribing_to_an_event_with_an_invalid_url : TestFixture
+	public class when_subscribing_to_an_event_with_an_invalid_url : behaves_like_failing_to_subscribe_to_an_event
 	{
-		HttpResponseMessage response;
-
 		public override void Observe()
 		{
 			response = api.PostAsJsonAsync("/hooks/", new
@@ -148,38 +156,64 @@ namespace Archon.Webhooks.Tests.Subscribing_to_an_event
 			}).Result;
 		}
 
-		[Observation]
-		public void should_return_bad_request_result()
+		protected override HttpStatusCode ExpectedResult
 		{
-			response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
-		}
-
-		[Observation]
-		public void should_not_persist_webhook()
-		{
-			events.Subscriptions.ShouldBeEmpty();
+			get { return HttpStatusCode.BadRequest; }
 		}
 	}
 
-	public class when_subscribing_to_an_event_with_a_missing_url : TestFixture
+	public class when_subscribing_to_an_event_with_a_missing_url : behaves_like_failing_to_subscribe_to_an_event
 	{
-		HttpResponseMessage response;
-
 		public override void Observe()
 		{
 			response = api.PostAsJsonAsync("/hooks/", new { }).Result;
 		}
 
-		[Observation]
-		public void should_return_bad_request_result()
+		protected override HttpStatusCode ExpectedResult
 		{
-			response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
+			get { return HttpStatusCode.BadRequest; }
+		}
+	}
+
+	public class when_subscribing_to_an_event_without_being_authenticated : behaves_like_failing_to_subscribe_to_an_event
+	{
+		public when_subscribing_to_an_event_without_being_authenticated()
+		{
+			security.ClearCredentials();
 		}
 
-		[Observation]
-		public void should_not_persist_webhook()
+		public override void Observe()
 		{
-			events.Subscriptions.ShouldBeEmpty();
+			response = api.PostAsJsonAsync("/hooks/", new
+			{
+				url = "http://example.com/"
+			}).Result;
+		}
+
+		protected override HttpStatusCode ExpectedResult
+		{
+			get { return HttpStatusCode.Unauthorized; }
+		}
+	}
+
+	public class when_subscribing_to_an_event_without_being_authorized : behaves_like_failing_to_subscribe_to_an_event
+	{
+		public when_subscribing_to_an_event_without_being_authorized()
+		{
+			security.AuthenticateWithoutPermissions("homer.simpson");
+		}
+
+		public override void Observe()
+		{
+			response = api.PostAsJsonAsync("/hooks/", new
+			{
+				url = "http://example.com/"
+			}).Result;
+		}
+
+		protected override HttpStatusCode ExpectedResult
+		{
+			get { return HttpStatusCode.Forbidden; }
 		}
 	}
 }
