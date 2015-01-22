@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using NHibernate;
@@ -19,6 +21,11 @@ namespace Archon.Webhooks.NHibernate
 		{
 			this.db = db;
 			this.client = client;
+		}
+
+		public IEnumerable<Webhook> GetSubscriptionsForCurrentUser()
+		{
+			return db.Query<Webhook>().Where(h => h.CreatedBy == Thread.CurrentPrincipal.Identity.Name);
 		}
 
 		public Webhook Subscribe(Uri url)

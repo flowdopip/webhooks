@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Archon.Webhooks
 {
 	public interface EventBus
 	{
+		IEnumerable<Webhook> GetSubscriptionsForCurrentUser();
+
 		Webhook Subscribe(Uri url);
 		void Unsubscribe(int id);
 

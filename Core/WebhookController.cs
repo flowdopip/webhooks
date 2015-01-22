@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,7 +9,6 @@ using Archon.WebApi;
 namespace Archon.Webhooks
 {
 	[RoutePrefix("hooks")]
-	[AuthorizeCorrectly(Roles = "Webhooks")]
 	public class WebhookController : ApiController
 	{
 		readonly EventBus bus;
@@ -18,8 +18,19 @@ namespace Archon.Webhooks
 			this.bus = bus;
 		}
 
+		[HttpGet]
+		[Route("")]
+		[AuthorizeCorrectly]
+		[EnsureTrailingSlash]
+		public HttpResponseMessage GetSubscriptions()
+		{
+			var hooks = bus.GetSubscriptionsForCurrentUser().ToArray();
+			return Request.CreateResponse(hooks);
+		}
+
 		[HttpPost]
 		[Route("")]
+		[AuthorizeCorrectly(Roles = "Webhooks")]
 		[EnsureTrailingSlash]
 		public HttpResponseMessage Subscribe(NewWebhook data)
 		{

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Archon.Webhooks
@@ -17,6 +18,11 @@ namespace Archon.Webhooks
 			this.client = client;
 			subscriptions = new Dictionary<Uri, Webhook>();
 			events = new HashSet<Event>();
+		}
+
+		public virtual IEnumerable<Webhook> GetSubscriptionsForCurrentUser()
+		{
+			return subscriptions.Values.Where(h => h.CreatedBy == Thread.CurrentPrincipal.Identity.Name);
 		}
 
 		public virtual Webhook Subscribe(Uri url)

@@ -42,19 +42,25 @@ namespace Archon.Webhooks.Tests
 			switch (auth)
 			{
 				case AuthStatus.Authorized:
-					request.GetRequestContext().Principal = new GenericPrincipal(new GenericIdentity(username), new[] { "Webhooks" });
+					SetPrincipal(request, new GenericPrincipal(new GenericIdentity(username), new[] { "Webhooks" }));
 					break;
 
 				case AuthStatus.AuthenticatedWithoutPermissions:
-					request.GetRequestContext().Principal = new GenericPrincipal(new GenericIdentity(username), new string[0]);
+					SetPrincipal(request, new GenericPrincipal(new GenericIdentity(username), new string[0]));
 					break;
 
 				case AuthStatus.NotAuthenticated:
-					request.GetRequestContext().Principal = null;
+					SetPrincipal(request, null);
 					break;
 			}
 
 			return base.SendAsync(request, cancellationToken);
+		}
+
+		void SetPrincipal(HttpRequestMessage request, IPrincipal principal)
+		{
+			request.GetRequestContext().Principal = principal;
+			Thread.CurrentPrincipal = principal;
 		}
 	}
 }

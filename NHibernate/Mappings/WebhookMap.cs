@@ -13,6 +13,9 @@ namespace Archon.Webhooks.NHibernate.Mappings
 
 			Id(x => x.Id).Column("WebHookId").GeneratedBy.Identity();
 			Map(x => x.Url).CustomType<UriType>().Unique();
+
+			Map(x => x.CreatedBy).Not.Nullable().Index("idx_web_Hooks_CreatedBy");
+			Map(x => x.CreatedOn).Not.Nullable().CustomType<UtcDateTimeType>();
 		}
 	}
 }
