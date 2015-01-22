@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Dynamic;
 using System.Net;
 using System.Net.Http;
@@ -64,6 +65,60 @@ namespace Archon.Webhooks.Tests.Unsubscribing_from_an_event
 		public void should_not_remove_persisted_webhook()
 		{
 			events.Subscriptions.ShouldNotBeEmpty();
+		}
+	}
+
+	public class when_unsubscribing_from_an_event_while_not_authenticated : behaves_like_existing_subscription
+	{
+		HttpResponseMessage response;
+
+		public when_unsubscribing_from_an_event_while_not_authenticated()
+		{
+			security.ClearCredentials();
+		}
+
+		public override void Observe()
+		{
+			response = api.DeleteAsync("/hooks/" + subscriptionId).Result;
+		}
+
+		[Observation]
+		public void should_return_unauthorized_result()
+		{
+			response.StatusCode.ShouldEqual(HttpStatusCode.Unauthorized);
+		}
+
+		[Observation]
+		public void should_not_remove_persisted_webhook()
+		{
+			events.Subscriptions.Count().ShouldEqual(1);
+		}
+	}
+
+	public class when_unsubscribing_from_an_event_while_not_authorized : behaves_like_existing_subscription
+	{
+		HttpResponseMessage response;
+
+		public when_unsubscribing_from_an_event_while_not_authorized()
+		{
+			security.AuthenticateWithoutPermissions("homer.simpson");
+		}
+
+		public override void Observe()
+		{
+			response = api.DeleteAsync("/hooks/" + subscriptionId).Result;
+		}
+
+		[Observation]
+		public void should_return_forbidden_result()
+		{
+			response.StatusCode.ShouldEqual(HttpStatusCode.Forbidden);
+		}
+
+		[Observation]
+		public void should_not_remove_persisted_webhook()
+		{
+			events.Subscriptions.Count().ShouldEqual(1);
 		}
 	}
 }
