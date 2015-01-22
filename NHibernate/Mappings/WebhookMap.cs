@@ -12,7 +12,7 @@ namespace Archon.Webhooks.NHibernate.Mappings
 			Table("Hooks");
 
 			Id(x => x.Id).Column("WebHookId").GeneratedBy.Identity();
-			Map(x => x.Url).CustomType<UriType>();
+			Map(x => x.Url).CustomType<UriType>().Unique();
 		}
 	}
 }

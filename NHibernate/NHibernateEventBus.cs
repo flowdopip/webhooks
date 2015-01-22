@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using log4net;
@@ -33,8 +34,13 @@ namespace Archon.Webhooks.NHibernate
 				if (db.Transaction == null || !db.Transaction.IsActive)
 					tx = db.BeginTransaction();
 
-				hook = new Webhook(url);
-				db.Save(hook);
+				hook = db.Query<Webhook>().FirstOrDefault(h => h.Url == url);
+
+				if (hook == null)
+				{
+					hook = new Webhook(url);
+					db.Save(hook);
+				}
 
 				if (tx != null)
 					tx.Commit();

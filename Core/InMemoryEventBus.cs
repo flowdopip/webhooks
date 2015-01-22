@@ -8,15 +8,15 @@ namespace Archon.Webhooks
 {
 	public class InMemoryEventBus : EventBus
 	{
-		protected readonly ISet<Webhook> subscriptions;
+		protected readonly IDictionary<Uri, Webhook> subscriptions;
 		protected readonly ISet<Event> events;
 		readonly HttpClient client;
 
 		public InMemoryEventBus(HttpClient client)
 		{
-			subscriptions = new HashSet<Webhook>();
-			events = new HashSet<Event>();
 			this.client = client;
+			subscriptions = new Dictionary<Uri, Webhook>();
+			events = new HashSet<Event>();
 		}
 
 		public virtual Webhook Subscribe(Uri url)
@@ -24,20 +24,22 @@ namespace Archon.Webhooks
 			if (url == null)
 				throw new ArgumentNullException("url");
 
-			var hook = new Webhook(url)
+			if (!subscriptions.ContainsKey(url))
 			{
-				Id = subscriptions.Any() ? subscriptions.Max(s => s.Id) + 1 : 1
-			};
+				subscriptions.Add(url, new Webhook(url)
+				{
+					Id = subscriptions.Any() ? subscriptions.Max(s => s.Value.Id) + 1 : 1
+				});
+			}
 
-			subscriptions.Add(hook);
-			return hook;
+			return subscriptions[url];
 		}
 
 		public virtual void Unsubscribe(int id)
 		{
 			foreach (var sub in subscriptions)
 			{
-				if (sub.Id == id)
+				if (sub.Value.Id == id)
 				{
 					subscriptions.Remove(sub);
 					break;
@@ -54,7 +56,7 @@ namespace Archon.Webhooks
 				throw new ArgumentNullException("evt");
 
 			foreach (var sub in subscriptions)
-				events.Add(new Event(sub, type, evt));
+				events.Add(new Event(sub.Value, type, evt));
 		}
 
 		public virtual async Task Publish()

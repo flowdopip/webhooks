@@ -10,7 +10,7 @@ namespace Archon.Webhooks
 
 		public IEnumerable<Webhook> Subscriptions
 		{
-			get { return subscriptions; }
+			get { return subscriptions.Values; }
 		}
 
 		public IEnumerable<Event> Events
