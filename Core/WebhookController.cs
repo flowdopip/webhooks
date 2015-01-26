@@ -55,6 +55,7 @@ namespace Archon.Webhooks
 
 		[HttpPost]
 		[Route("flush")]
+		[AllowAnonymous]
 		[EnsureNoTrailingSlash]
 		public async Task FlushEvents()
 		{
