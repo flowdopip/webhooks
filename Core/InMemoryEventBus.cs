@@ -25,6 +25,11 @@ namespace Archon.Webhooks
 			return subscriptions.Values.Where(h => h.CreatedBy == Thread.CurrentPrincipal.Identity.Name);
 		}
 
+		public virtual IEnumerable<Event> GetEventsForSubscription(int hookId)
+		{
+			throw new NotImplementedException();
+		}
+
 		public virtual Webhook Subscribe(Uri url)
 		{
 			if (url == null)

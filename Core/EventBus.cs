@@ -7,6 +7,7 @@ namespace Archon.Webhooks
 	public interface EventBus
 	{
 		IEnumerable<Webhook> GetSubscriptionsForCurrentUser();
+		IEnumerable<Event> GetEventsForSubscription(int hookId);
 
 		Webhook Subscribe(Uri url);
 		void Unsubscribe(int id);

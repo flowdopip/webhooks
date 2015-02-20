@@ -28,6 +28,11 @@ namespace Archon.Webhooks.NHibernate
 			return db.Query<Webhook>().Where(h => h.CreatedBy == Thread.CurrentPrincipal.Identity.Name);
 		}
 
+		public IEnumerable<Event> GetEventsForSubscription(int hookId)
+		{
+			throw new NotImplementedException();
+		}
+
 		public Webhook Subscribe(Uri url)
 		{
 			if (url == null)
