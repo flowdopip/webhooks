@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Archon.WebApi;
 
-namespace Archon.Webhooks
+namespace Archon.Webhooks.Api
 {
 	[RoutePrefix("hooks")]
-	public class WebhookController : ApiController
+	public class HookController : ApiController
 	{
 		readonly EventBus bus;
 
-		public WebhookController(EventBus bus)
+		public HookController(EventBus bus)
 		{
 			this.bus = bus;
 		}
@@ -60,11 +60,6 @@ namespace Archon.Webhooks
 		public async Task FlushEvents()
 		{
 			await bus.Publish();
-		}
-
-		public class NewWebhook
-		{
-			public Uri Url { get; set; }
 		}
 	}
 }
