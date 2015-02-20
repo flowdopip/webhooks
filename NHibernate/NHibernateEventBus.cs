@@ -70,6 +70,10 @@ namespace Archon.Webhooks.NHibernate
 				if (db.Transaction == null || !db.Transaction.IsActive)
 					tx = db.BeginTransaction();
 
+				db.CreateQuery("delete from Event where Hook.Id = ?")
+					.SetInt32(0, id)
+					.ExecuteUpdate();
+
 				db.CreateQuery("delete Webhook where Id = ?")
 					.SetInt32(0, id)
 					.ExecuteUpdate();

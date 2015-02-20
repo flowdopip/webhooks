@@ -27,4 +27,26 @@ namespace Archon.Webhooks.NHibernate.Tests.Unsubscribing_from_an_event
 			db.Query<Webhook>().ShouldBeEmpty();
 		}
 	}
+
+	public class when_unsubscribing_from_an_event_with_queued_events : behaves_like_a_subscribed_event
+	{
+		public when_unsubscribing_from_an_event_with_queued_events()
+		{
+			bus.Queue("fake.event", new
+			{
+				hello = "world"
+			});
+		}
+
+		public override void Observe()
+		{
+			bus.Unsubscribe(id);
+		}
+
+		[Observation]
+		public void should_remove_webhook_subscription_from_database()
+		{
+			db.Query<Webhook>().ShouldBeEmpty();
+		}
+	}
 }
