@@ -57,6 +57,9 @@
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
+    <Compile Include="Api\EventController.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Api\NewWebhook.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="EventBus.cs" />
